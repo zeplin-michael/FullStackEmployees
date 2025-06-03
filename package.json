@@ -16,6 +16,7 @@
     "#*": "./*.js"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.8.0",
     "express": "^5.1.0",
     "pg": "^8.14.1"
   },
