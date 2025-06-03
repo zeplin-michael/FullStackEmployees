@@ -46,8 +46,7 @@ describe('"employees" table', () => {
     test('"name" exists, is type text, and is not nullable', () => {
       const name = columns.find((column) => column.column_name === "name");
       expect(name).toBeDefined();
-      //Check this with estaban (text)
-      expect(name.data_type).toBe("character varying");
+      expect(name.data_type).toBe("text");
       expect(name.is_nullable).toBe("NO");
     });
 
@@ -63,9 +62,8 @@ describe('"employees" table', () => {
     test('"salary" exists, is type integer, and is not nullable', () => {
       const running = columns.find((column) => column.column_name === "salary");
       expect(running).toBeDefined();
-      // Chech this with Estaban (integer/yes)
-      expect(running.data_type).toBe("numeric");
-      expect(running.is_nullable).toBe("YES");
+      expect(running.data_type).toBe("integer");
+      expect(running.is_nullable).toBe("NO");
     });
   });
 

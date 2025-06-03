@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS employees;
 CREATE TABLE employees (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(30) UNIQUE NOT NULL,
+    name TEXT UNIQUE NOT NULL,
     birthday DATE NOT NULL,
     salary INTEGER NOT NULL
 )
