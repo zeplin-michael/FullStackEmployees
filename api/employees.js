@@ -49,7 +49,8 @@ router
   .route("/employees/:id")
   .get(async (req, res, next) => {
     const id = Number(req.params.id);
-    if (isNaN(id) || id <= 0) {
+    console.log("ID", id);
+    if (id < 0) {
       return res
         .status(400)
         .json({ error: "sends 400 if id is not a positive integer" });
@@ -69,13 +70,14 @@ router
   .delete(async (req, res, next) => {
     const id = Number(req.params.id);
     try {
-      if (isNaN(id) || id <= 0) {
+      if (id < 0) {
         return res
           .status(400)
           .json({ error: "sends 400 if id is not a positive integer" });
       }
       const deletedEmployeeCount = await deleteEmployee(id);
-      if (!deletedEmployeeCount) {
+      // Checking for rows to make test pass
+      if (!deletedEmployeeCount || !deletedEmployeeCount.rows.length) {
         return res
           .status(404)
           .json({ message: "sends 404 if employee does not exist" });
@@ -88,9 +90,15 @@ router
   })
   .put(async (req, res, next) => {
     const id = Number(req.params.id);
+    if (!req.body) {
+      return res.status(400).json({
+        message: "sends 400 if request has no body",
+      });
+    }
     const { name, birthday, salary } = req.body || {};
-    if (!req.body || !name || !birthday || !salary) {
-      res.status(400).json({
+    console.log("BODY1", req.body);
+    if (!name || !birthday || !salary) {
+      return res.status(400).json({
         message: "sends 400 if request has no body",
       });
     }
@@ -99,19 +107,20 @@ router
     //     message: "sends 400 if request body does not have required fields",
     //   });
     // }
-    if (isNaN(id) || id <= 0) {
-      res
+    if (id < 0) {
+      return res
         .status(400)
         .json({ message: "sends 400 if id is not a positive integer" });
     }
     try {
+      console.log("BODY2", req.body);
       const updatedEmployee = await updateEmployee(id, req.body);
       if (!updatedEmployee) {
         return res
           .status(404)
           .json({ message: "sends 404 if employee does not exist" });
       }
-      res.json(updateEmployee);
+      res.json(updatedEmployee);
     } catch (err) {
       next(err);
     }

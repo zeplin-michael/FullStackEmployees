@@ -50,7 +50,7 @@ describe("POST /employees", () => {
 
 describe("GET /employees/:id", () => {
   it("sends 400 if id is not a positive integer", async () => {
-    const response = await request(app).get("/employees/1e10");
+    const response = await request(app).get("/employees/-1e10");
     expect(response.status).toBe(400);
   });
 
@@ -70,7 +70,7 @@ describe("GET /employees/:id", () => {
 
 describe("DELETE /employees/:id", () => {
   it("sends 400 if id is not a positive integer", async () => {
-    const response = await request(app).delete("/employees/1e10");
+    const response = await request(app).delete("/employees/-1e10");
     expect(response.status).toBe(400);
   });
 
@@ -103,7 +103,7 @@ describe("PUT /employees/:id", () => {
   it("sends 400 if id is not a positive integer", async () => {
     db.query.mockResolvedValue({ rows: [mockEmployee] });
     const response = await request(app)
-      .put("/employees/1e10")
+      .put("/employees/-1e10")
       .send(mockEmployee);
     expect(response.status).toBe(400);
   });

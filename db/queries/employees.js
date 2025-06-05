@@ -55,5 +55,5 @@ export async function deleteEmployee(id) {
   // TODO
   const SQL = `DELETE FROM employees WHERE id=$1 `;
   const result = await db.query(SQL, [id]);
-  return result.rowCount;
+  return result;
 }
