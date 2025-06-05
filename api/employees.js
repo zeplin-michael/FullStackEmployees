@@ -1,6 +1,5 @@
 import express from "express";
-const router = express.Router();
-export default router;
+
 import {
   createEmployee,
   deleteEmployee,
@@ -9,31 +8,38 @@ import {
   updateEmployee,
 } from "#db/queries/employees";
 
+const router = express.Router();
+
 // TODO: this file!
-router.route("/").get(async (req, res) => {
-  res.status(200).json({ message: "Welcome to the Fullstack Employees API." });
+router.route("/").get((req, res) => {
+  res.status(200).send("Welcome to the Fullstack Employees API.");
 });
 
 router
   .route("/employees")
-  .get(async (req, res) => {
-    const employees = await getEmployees();
-    res.send(employees);
+  .get(async (req, res, next) => {
+    try {
+      const employees = await getEmployees();
+      res.status(200).json(employees);
+    } catch (err) {
+      next(err);
+    }
   })
   .post(async (req, res, next) => {
     try {
-      if (!req.body) {
+      const { name, birthday, salary } = req.body || {};
+      if (!req.body || !name || !birthday || !salary) {
         return res
           .status(400)
           .json({ message: "sends 400 if request has no body" });
       }
-      if (!req.body.name || !req.body.birthday || !req.body.salary) {
-        res.status(400).json({
-          message: "sends 400 if request body does not have required fields",
-        });
-      }
+      // if (!req.body.name || !req.body.birthday || !req.body.salary) {
+      //   res.status(400).json({
+      //     message: "sends 400 if request body does not have required fields",
+      //   });
+      // }
       const newEmployee = await createEmployee(req.body);
-      res.status(201).send(newEmployee);
+      res.status(201).json(newEmployee);
     } catch (err) {
       next(err);
     }
@@ -42,13 +48,14 @@ router
 router
   .route("/employees/:id")
   .get(async (req, res, next) => {
-    if (req.params.id <= 0) {
+    const id = Number(req.params.id);
+    if (isNaN(id) || id <= 0) {
       return res
         .status(400)
         .json({ error: "sends 400 if id is not a positive integer" });
     }
     try {
-      const employee = await getEmployee(req.params.id);
+      const employee = await getEmployee(id);
       if (!employee) {
         return res
           .status(404)
@@ -60,13 +67,14 @@ router
     }
   })
   .delete(async (req, res, next) => {
+    const id = Number(req.params.id);
     try {
-      if (req.params.id <= 0) {
+      if (isNaN(id) || id <= 0) {
         return res
           .status(400)
           .json({ error: "sends 400 if id is not a positive integer" });
       }
-      const deletedEmployeeCount = await deleteEmployee(req.params.id);
+      const deletedEmployeeCount = await deleteEmployee(id);
       if (!deletedEmployeeCount) {
         return res
           .status(404)
@@ -79,24 +87,25 @@ router
     }
   })
   .put(async (req, res, next) => {
-    if (!req.body) {
+    const id = Number(req.params.id);
+    const { name, birthday, salary } = req.body || {};
+    if (!req.body || !name || !birthday || !salary) {
       res.status(400).json({
         message: "sends 400 if request has no body",
       });
     }
-    if (!req.body.name || !req.body.birthday || !req.body.salary) {
-      res.status(400).json({
-        message: "sends 400 if request body does not have required fields",
-      });
-    }
-    if (req.params.id <= 0) {
+    // if (!req.body.name || !req.body.birthday || !req.body.salary) {
+    //   res.status(400).json({
+    //     message: "sends 400 if request body does not have required fields",
+    //   });
+    // }
+    if (isNaN(id) || id <= 0) {
       res
         .status(400)
         .json({ message: "sends 400 if id is not a positive integer" });
     }
-
     try {
-      const updatedEmployee = await updateEmployee(req.params.id, req.body);
+      const updatedEmployee = await updateEmployee(id, req.body);
       if (!updatedEmployee) {
         return res
           .status(404)
@@ -107,3 +116,5 @@ router
       next(err);
     }
   });
+
+export default router;
